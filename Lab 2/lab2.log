@@ -1,0 +1,154 @@
+Ross Collin Guieb
+104416194
+Lab 2 Log
+
+After thorougly reading through the lab specs, the first thing I did was check
+my locale using the command:
+locale
+
+The locale was still in the default "en_US.UTF-8", so I changed it using the
+command:
+export LC_ALL='C'
+
+Next, I created my sorted list of words file called words using:
+touch words
+sort -o /usr/share/dict/words words
+
+Following the assignment, I downloaded the HTML file called assign2.html using:
+wget http://web.cs.ucla.edu/classes/fall15/cs35L/assign/assign2.html
+
+Next, I ran the following commands:
+
+*Note that [:alpha:] does the same as 'A-Za-z'.
+
+tr -c 'A-Za-z' '[\n*]' <assign2.html> sort1
+This command removed all non-letter characters and put each word onto its own
+line.
+
+tr -cs 'A-Za-z' '[\n*]' <assign2.html> sort2
+This command differed from the previous one because it created a list of words,
+one per line, and removed new lines.
+
+tr -cs 'A-Za-z' '[\n*]' <assign2.html> sort3 | sort sort3
+This command did the same as above, except the words were sorted alphabetically.
+
+tr -cs 'A-Za-z' '[\n*]' <assign2.html> sort4 | sort -u sort4
+This command did the same as above, but eliminates repeated instances.
+
+tr -cs 'A-Za-z' '[\n*]' <assign2.html> sort5 | sort -u sort5 | comm - words
+This command lists both the sorted list with no repeats alongside the
+words file. Column 1 lists the words in sort5 and column 2 lists the
+words in words and column
+3 lists the words in both files.
+
+tr -cs 'A-Za-z' '[\n*]' <assign2.html> sort5 | sort -u sort5 | comm -23 - words
+This command does the same as above, but only lists column 3 - the shared words
+of both files in sorted order.
+
+Next, start working on the shell script to systematically extract the Hawaiian
+words from the html file.
+
+REMEMBER:
+-treat upper case as lower case
+-ignore html script <> within words
+-treat ` (backtick) as ' (apostrophe)
+-if there are spaces within entries, treat as seperate words
+-reject entries with non-Hawaiian letters at end
+-sort list of words and remove duplicates
+
+The Hawaiian alphabet is limited to:
+p k ' m n w l h a e i o u.
+
+Look for the pattern "<tr> <td>Eword</td> <td>Hword</td>" where Eword is the
+English word and Hword is the Hawaiian word. Extract the Hawaiian words only,
+adhering to the above rules and store them into a file called hwords.
+
+
+Start first by downloading the html file for "English to Hawaiian"
+using the command:
+wget http://mauimapp.com/moolelo/hwnwdseng.htm
+
+Rename it for simplicity:
+mv hwnwdseng.htm hawaiian.html
+
+Now we can start on the script file!
+
+#!/bin/bash
+# use this to start shell scripts
+
+sed s/\`/\'/g |
+# replaces all ` to '
+
+sed '/<tr>/,/<\/td>/d' |
+# deletes English words since they are in the lines
+# between the <tr> and <\/td>
+
+grep '<td>.*<\/td>' |
+# grabs the Hawaiian words which are all between <td> and <\td> tags
+
+sed 's/<[^>]*>//g' |
+# deletes additional html formatting around the Hawaiian words
+
+tr " " "\n" |
+tr "," "\n" |
+# translates spaces and commas to newlines
+
+tr '[:upper:]' '[:lower:]' |
+# converts words to all lowercase
+
+tr -d '[:blank:]'
+# deletes extra blank spaces
+
+sort -u |
+# sorts words alphabetically and removes duplicates
+
+grep -v "[bcdfgjqrstvxyz?!]"
+# not sure what to do about the word with the question mark ?
+# assume that it is not a character in the Hawaiian alphabet
+# so remove the word altogether
+# this removes words with characters that are not in the Hawaiian alphabet
+
+This completes the script for the lab. Next, I ran a few tests.
+
+I used the wc command to find that there are a total of 206 words in the output.
+
+Then I ran:
+
+cat hawaiian.html | ./buildwords > hwords
+
+to create the hwords Hawaiian dictionary.
+
+
+Next, I tested the hwords file against the assign2.html, similar to the
+above exercises.
+
+Create list of sorted, lowercase, unique words from the assign2.html:
+
+tr -cs 'A-Za-z' '[\n*]' <assign2.html> webpage
+tr '[:upper:]' '[:lower:]' <webpage> temp
+sort -u temp > webpage
+
+From here, we check the webpage against the Hawaiian dictionary:
+
+comm -23 webpage hwords | wc
+
+We see that there are a total of 405 misspelled words (checking against hwords).
+
+Using:
+comm -12 webpage hwords
+We find 7 correctly spelled words including:
+e, halau, i, kula, lau, make, & wiki
+
+
+comm -23 webpage words | wc
+
+From the command, we find there are 38 misspelled words (checking with words).
+Misspelled words include wikipedia, http, linux etc.
+
+We find there are a total of 374 correctly spelled words.
+
+Adding the totals of each, we find that the word count is 412 for both.
+This reaffirms that both are spell checkers are accurate.
+
+
+

@@ -1,0 +1,70 @@
+R. Collin Guieb
+104416194
+Lab 6: SSH setup and use in applications
+
+My partner for this lab was Shannon Phu. 
+
+After opening ubuntu, we want to make sure we have both the openssh-server and
+openssh-client installed. We check this using:
+
+$ dpkg --get-selections | grep openssh
+
+Mine did not have the server installed, so I installed it using:
+
+$ sudo apt-get install openssh-server
+
+------
+
+First, I acted as the client. My first step was to generate public and private keys:
+
+$ ssh-keygen
+
+I saved the key, created a passphrase, and copied the public key to the server for key-based authentication:
+It was saved to the directory (~/.ssh/authorized_keys)
+
+$ ssh-copy-id -i collin2@10.97.85.125
+
+At this point, the server warned me and showed the key fingerprint and asked if I wanted to continue.
+I said yes, and continued from here.
+
+Next, we add the private key to the authentication agent:
+
+$ ssh-add
+
+And now, I SSH to my partner's server:
+
+$ ssh collin2@10.97.85.125
+
+Lastly, I tested the following commands on the host and they all worked:
+
+$ xterm
+$ gedit
+$ firefox
+
+------
+
+Next, I acted as the server host. I reused my public and private keys from the previous step.
+
+I then created an account (username and password) for Shannon on my server:
+
+$ sudo useradd -d /home/shannon -m shannon
+$ sudo passwd shannon
+
+After, I created the .ssh directory for my new user:
+
+$ cd /home/shannon
+$ sudo mkdir .ssh
+
+I changed the ownership and permission on the newly created .ssh directory:
+
+$ sudo chown -R shannon .ssh
+$ sudo chmod 700 .ssh
+
+In order for my partner to login I needed to obtain my IP address. I found it using:
+
+$ ifconfig
+
+The IP address for my server was: 10.97.85.162
+
+
+-----

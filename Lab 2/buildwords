@@ -1,0 +1,24 @@
+#!/bin/bash
+
+sed s/\`/\'/g |
+
+sed '/<tr>/,/<\/td>/d' |
+
+grep '<td.*<\/td>' |
+    
+sed 's/<[^>]*>//g' |
+
+tr " " "\n" |
+
+tr "," "\n" |
+
+tr '[:upper:]' '[:lower:]' |
+
+tr -d '[:blank:]' |
+
+sort -u |
+
+grep -v "[bcdfgjqrstvxyz?!.]"
+
+
+

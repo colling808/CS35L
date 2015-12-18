@@ -1,0 +1,142 @@
+Ross Collin Guieb
+104416194
+Lab 3: Modifying and Rewriting Software
+
+Our main goal for this lab is to install coreutils and apply a patch
+that fixes the date format under the ls command for all users.
+
+After thoroughly reading through the specs, we grab the download
+the coreutils 7.6 file using:
+
+wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+
+and from here move the file into lab3 directory:
+
+mv coreutils-7.6.tar.gz ~/CS35L/lab3
+
+Next, unzip the tar file and make a directory for it.
+
+tar -xzvf coreutils-7.6.tar.gz
+
+mkdir coreutilsInstall
+
+
+Next, to the coreutils directory and install the file. Make
+sure
+to read the information for INSTALL (man INSTALL).
+Set the prefix to the coreutilesInstall directory, so
+that the files will be installed there, since we do not
+have permission to install into the default directory.
+
+./configure --prefix=/w/home.05/cs/ugrad/ross/CS35L/
+lab3/coreutilsInstall
+
+(Note: the whole address must be used, without shortcuts
+or else make install will not work)
+
+Next, make and make install to actually install the files.
+
+make
+
+make install
+
+After installing, we now want to test the bug by running
+coreutil's version of ls as follows (make sure you are in
+the coreutilsInstall directory):
+
+./bin/ls -l
+
+We use -l for long-list format so it displays the date
+as well as other things about the files.
+
+When we run it, we find that the date format is wrong.
+
+It reads:
+2015-10-16
+
+When we want:
+Oct 16 2015
+
+
+So from here, the next step is to apply a patch. So we
+need to copy and paste Brady's patch into an emacs file.
+
+emacs patch
+
+and then copy and paste the patch from --- a/src/ls.c
+down to the line --, just above 1.6.2.5.
+
+
+IDEALLY, WHEN THE PATCH COMMAND IS WORKING, DO THE
+FOLLOWING:
+Look at "man patch" to see how patching works. Then in
+the coreutils-7.6 directory, run:
+
+patch -lp1 < ~/CS35L/lab3/patch
+make
+
+-l option for patch ignores white space
+-pnum strips n prefixes from the file name when patching
+
+NOTE: patch was applied manually because I kept getting the
+error message:
+**** malformed patch at line 10:
+
+---
+
+CONFIGURE was not needed because the files were already
+configured, meaning the dependencies between files were
+already checked and put into the makefile.
+
+MAKE was needed because we needed to recompile the program
+files since we modified ls.c. 
+
+MAKE INSTALL was not needed because we were asked not to.
+The executable was already created for ls using MAKE. We
+do not need to reinstall the entire program into another
+directory.
+
+---
+
+Once the patch is applied, we can test it in the
+coreutils-7.6 directory by using:
+
+./src/ls -l
+
+And from this, we get the correct format with MM DD YYYY:
+Oct 16 20:45
+
+But if we go to the coreutilsInstall directory
+
+./bin/ls -l
+
+still gives the numerical YYYY-MM-DD:
+2015-10-16
+
+---
+
+Next, I ran the following test cases:
+
+Testing it on a recently modified function:
+
+./coreutils-7.6/src/ls -l lab3.txt
+
+Oct 16 20:50
+
+Testing it on a file that is at least a year old:
+
+(first artificially create an old file)
+
+touch -t 199912251200 old_date
+./coreutils-7.6/src/ls -l old_date
+
+Dec 25 1999
+
+---
+
+
+
+
+
+
+

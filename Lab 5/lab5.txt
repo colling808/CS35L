@@ -1,0 +1,95 @@
+R. Collin Guieb
+104416194
+Lab 5: C Programming and Debugging
+
+The goal of this lab is to debug a bug in an old version of coreutils that mishandles files and time stamps.
+
+We begin by obtaining the desired version of coreutils and untar-ing the files.
+
+wget <link>
+tar -xzvf coreutils-with-bug.tar.gz
+./configure
+make
+
+When building the file as is, there is a error involving conflicting types for 'futimens' in utimecmp.c and
+utimecmp.h. This causes errors when building utimecmp.o.
+
+Now, to apply the patch to fix this issue:
+
+wget <link>
+mv coreutils.diff renamePatch
+patch -p0 < renamePatch
+make
+
+This patch fixes the issue by simply renaming the functions to ensure that the correct return type is used
+since the name was used previously.
+
+Now we can reproduce the bug in a temporary directory like so:
+
+tmp=$(mktemp -d)
+cd $tmp
+touch -d '1918-11-11 11:00 GMT' wwi-armistice
+touch now
+sleep 1
+touch now1
+TZ=UTC0 ~/CS35L/lab5/coreutils-with-bug/src/ls -lt --full-time wwi-armistice now now1
+
+The command 'ls -t' normally displays files with newest time first, but the bug does not do that.
+We are shown the files in the order of:
+
+wwi-armistice
+now1
+now
+
+-----
+
+We want to debug the program using the gdb debugger within the tmp directory as follows:
+
+emacs ~/CS35L/lab5/coreutils-with-bug/src/ls
+M-x gdb
+gdb -i=mi ls
+
+Since this is a logic error, we will want to set breakpoints to find where the program is faulty.
+Looking in the source code for ls.c and running the debugger a few times, we find the functions we want examine:
+
+(gdb) b main
+(gdb) b sort_files
+(gdb) b compare_mtime
+(gdb) b cmp_mtime
+(gdb) b timespec_cmp
+
+We also want to set a watchpoint on the variable diff since this is what is being returned.
+
+Set the directory to the tmp directory 
+
+(gdb) cd /tmp/tmp.21GLSu5Etn
+(gdb) r -lt
+
+From here, we can see that within the file lib/timespec.h in the function timespec_cmp, a.tv_sec is a
+large positive number but b.tv_sec is a negative number. But diff which is the difference of a.tv_sec
+and b.tv_sec returns a negative number. This must mean that there is integer overflow. We can fix this
+by changing diff from an int to a long int.
+
+Next, create a patch for the change using:
+
+diff -u coreutils-with-bug/lib/timespec.h coreutils-with-bug/lib/timespec-fixed.h > lab5.diff
+
+Also, manually add to ChangeLog using emacs command (C-x 4 a).
+
+-----
+
+Lastly, if we test our files in the home directory using the built-in ls commands, we get:
+
+Dec 17 2054 wwi-armistice
+
+Timestamps are interpreted by 32-bit integers as the number of seconds since midnight of Jan 1 1970.
+Positive numbers denote dates after this Unix Epoch and negatives denote dates before it.
+This error occurs because the SEASnet NFS file system has 32-bit unsigned time stamps, which means it
+only interprets positive numbers. The local file system in which the tmp directory was used has 32-bit
+signed time stamps, which allow it to interpret both negative and positive numbers.
+
+Since SEASnet only can interpret unsigned time stamps, the wwi-armistice is interpreted as a positive
+number, a date after 1970.
+
+
+

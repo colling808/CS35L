@@ -1,0 +1,60 @@
+R. Collin Guieb
+104416194
+Lab 8: Multithreaded Performance
+
+The purpose of this lab is to evaluate the performance of the multithreaded sort command.
+
+------
+
+I started first by exporting the following path to ensure that I am running on the most
+current version of GNU.
+
+$ export PATH=/usr/local/cs/bin:$PATH
+
+We can check that we are on a new enough version using
+
+$ sort --version
+
+which gives us the 2015 version.
+
+---
+
+Next, we generated a file containing 10,000,000 random double-precision floating point numbers,
+in textual form, one per line with no white space.
+
+$ od -A n -t f8 -N 80000000 < /dev/urandom | tr -s ' ' '\n' > random.txt
+
+Use emacs editor to delete the first blank empty line if any.
+
+---
+
+Next, we will evaluate the performance of the sort --parallel with varying number of threads
+using the time command.
+
+$ time -p sort -g --parallel=N random.txt > /dev/null
+
+where N is the number of threads. 
+
+for N=1 threads:
+      real 184.12
+      user 178.52
+      sys 5.60
+
+for N=2 threads:
+    real 99.29
+    user 185.01
+    sys 2.83
+
+for N=4 threads:
+    real 59.47
+    user 191.76
+    sys 3.81
+
+for N=8 threads:
+    real 41.01
+    user 205.91
+    sys 5.70
+
+
+From the above results, we see that multithreading with the sort command improves performance.
+While the user time increases, the overall processing time decreases.

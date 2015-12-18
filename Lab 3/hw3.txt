@@ -1,0 +1,35 @@
+Ross Collin Guieb
+104416194
+Homework 3
+
+Q1: Removing "case_long_iso_time_style" was not
+necessary to move. It was a goto line in the code
+(not a switch case like the line before it). Since
+we also deleted the line that said to goto that line,
+leaving it in would not hurt the program. We deleted
+it merely for clarity and readability.
+
+Q2: The patch will potentially run into problems
+where the locale does not have translations for both
+long_time and long_iso_time formats. If the program
+is run in a country that does not use English/English
+-format dates, then the month will not be translated
+correctly, which is perhaps why the number system was
+used over words.
+
+Q3: If we run randline.py on an empty file like
+/dev/null, we get an error. The output is a traceback
+of randline.py, and shows us that it fails at line 261
+since the index is out of range. This is because we input
+a file that has no lines, so the random sequence cannot
+pick a random line from nothing.
+
+Q4: Using python3 instead of python2 gives us a syntax
+error at line 65, instead of printing out what it is
+supposed to. This is because python3 changed its format
+for automatic tuple unpacking. Automatic tuple unpacking
+is when a tuple or list is allowed as a normal parameter.
+This is not supported at line 65 for the tuple (errno,
+strerror).
+
+

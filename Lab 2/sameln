@@ -1,0 +1,66 @@
+#!/bin/bash
+
+dir=$1
+RESULT=`ls -a $dir`
+declare -a ARRAY
+
+IFS=$'\n'
+# this allows files that include spaces in the name
+# to be read into the ARRAY
+if [ -d "$dir" ]; then
+    let count=0
+    for FILE in $RESULT
+    do
+	if [ ! -L "$dir/$FILE" ];
+	# checks if file is not a symbolic link
+	then
+	    if [ -f "$dir/$FILE" ];
+	    # checks if file is a regular file
+	    then
+		echo "$dir/$FILE is a regular file."
+		ARRAY[$count]="$dir/$FILE"
+		let count=count+1
+		# copies files into array and keeps count
+	    else
+		echo "$dir/$FILE is NOT a regular file."
+	    fi
+	fi
+    done
+    echo "There are $count regular files."
+IFS=$' '
+    
+    # we assume 'C' locale from specs so array is pre-sorted
+    # loop through each file in ARRAY
+    for ((i=0; i<count-1; i++))
+    do
+	FILE1=${ARRAY[$i]}
+	if [ ! -r "$FILE1" ]
+	# detects if file is readable 
+	then 
+	    echo "ERROR: $FILE1 is not a readable file."
+	else
+	    for ((j=i+1; j<count-1; j++))
+	    do
+		FILE2=${ARRAY[$j]}
+		if [ -r "$FILE2" ]
+		then
+		    cmp -s "$FILE1" "$FILE2"
+		    ret=$?
+		    # compare files
+		    # ret=0 means duplicates
+		    # ret=1 means different
+		    if [ $ret -eq 0 ]
+		    then 
+			echo "$FILE2 is changing to a hardlink of $FILE1"
+			ln -f -- "$FILE1" "$FILE2"
+			# creates a hardlink for FILE2 to FILE1
+			# remember to double quote files to ensure special
+			# characters are not read in the wrong way
+		    fi
+		fi
+	    done 
+	fi
+    done 
+else
+    echo "$dir directory does not exist."
+fi

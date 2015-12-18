@@ -1,0 +1,11 @@
+--- coreutils-with-bug/lib/timespec.h	2015-11-01 18:20:23.093871000 -0800
++++ coreutils-with-bug/lib/timespec-fixed.h	2015-11-01 18:21:07.072011000 -0800
+@@ -45,7 +45,7 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;
++  long int diff = a.tv_sec - b.tv_sec;
+   return diff ? diff : a.tv_nsec - b.tv_nsec;
+ }
+ 
