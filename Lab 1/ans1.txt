@@ -1,0 +1,123 @@
+OB1. Use the command: jman -K <specific word> to print all commands with
+that specific word.
+
+This can be found using man man.
+
+2. cp is located in /usr/share/man/man1p/cp.1p.gz
+wc is located in /usr/share/man/man1p/wc.1p.gz
+
+The source location of these commands is found using whereis cp / whereis wc.
+
+3. [ is a one-character executable program.
+[ is a synonym for test.
+
+This is found by changing the directory as follows:
+cd /usr/local/cs/bin
+
+Find one-character programs using:
+ls ?
+
+Then use help [ to define the program.
+
+4. When the symbolic link /usr/bin/cc is executed, gcc is executed.
+
+To find this, use:
+ls -l /usr/bin/cc
+
+5. g-s takes away the group's permissions on a file that were given
+with setgid (g+s).
+
+Find using man chmod.
+
+6. add the option -mtime -3 to find files that have been modified
+in the last 3 days.
+
+Find using man find.
+
+7. /.emacs.d/auto-save-list  was updated within the last 3 days.
+
+find -type d -mtime -3
+was used to answer this.
+
+8. 346
+
+First, find find's directory using:
+
+whereis find
+
+Then, go there using:
+
+cd /usr/bin
+
+Next, list and count only the symbolic links within the directory:
+ls . -type l | wc
+
+9. libgamin-1.so.0.1.10 is the oldest modified file
+
+First go to the /usr/lib directory:
+
+cd /usr/lib
+
+List the files by date modified and look at oldest:
+
+ls -t
+
+10. locale derives its data from "en_US.UTF-8"
+Found by running the locale command.
+
+11. sort, sort-subr, Buffer-menu-sort, sort-columns, sort-fields,
+sort-lines, sort-numeric-fields, sort-pages, sort-paragraphs,
+sort-regexp-fields, tabulated-list-sort, tabulated-list-col-sort
+
+within the emacs manual, use:
+a sort and d sort
+
+12. To find what each key sequence does in the emacs help manual:
+
+c KEYS
+
+C-a runs the command move-beginning-of-line
+C-b runs the command backward-char
+C-d runs the command delete-char
+C-e runs the command move-end-of-line
+C-f runs the command forward-char
+C-g runs the command keyboard-quit
+C-h runs the command help-for-help
+C-i (or TAB) runs the command indent-for-tab-command
+C-j runs the command electric-newline-and-maybe-indent
+C-k runs the command kill-line
+C-l runs the command recenter-top-bottom
+C-m (or RET) runs the command newline
+C-n runs the command next-line
+C-o runs the command open-line
+C-p runs the command previous-line
+C-q runs the command quoted-insert
+C-r runs the command isearch-backward
+C-s runs the command isearch-forward
+C-t runs the command transpose-chars
+C-u runs the command universal-argument
+C-v runs the command scroll-up-command
+C-w runs the command kill-region
+C-y runs the command yank
+C-z runs the command suspend-frame
+
+
+13. Quitting with 'C-g' gets rid of a partially typed command,
+or numeric argument you don't want. 'C-g' stops a command in a
+relatively safe way.
+
+Found within emacs help manual using:
+
+F keyboard-quit
+
+14. The yank funciton reinserts the last stretch of text.
+It reinserts the most recent kill, which is the stretch of
+killed text most recently killed or yanked.
+
+f yank
+
+15. The colors are different when running
+
+ls -l in /usr/bin
+and
+C-x d in emacs
